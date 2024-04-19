@@ -69,7 +69,6 @@ fi
 chmod +x ../python $PYTHON_MAJOR $PYTHON_MAJOR_DOT_MINOR $PYTHON_MAJOR_MINOR python
 
 echo "Upgrading pip..."
-Upgrading pip..."
 export PIP_ROOT_USER_ACTION=ignore
 ./python -m ensurepip
 ./python -m pip install --ignore-installed pip --disable-pip-version-check --no-warn-script-location
