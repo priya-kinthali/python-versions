@@ -75,6 +75,13 @@ class UbuntuPythonBuilder : NixPythonBuilder {
         Execute-Command -Command "sudo apt-get update"
         Execute-Command -Command $tkinterInstallString
 
+### install liblzma-dev for Python 3.3.0 and higher versions
+    
+        if ($this.Version -ge "3.3.0") {
+            Execute-Command -Command "sudo apt-get install liblzma-dev"
+        }       
+
+        
         ### Install dependent packages
         @(
             "make",
