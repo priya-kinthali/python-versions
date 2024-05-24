@@ -70,6 +70,14 @@ jobs:
       ARTIFACT_NAME: python-${{ inputs.VERSION || '3.12.3' }}-${{ matrix.platform }}-${{ matrix.arch }}
     steps:
 
+      - name: Setup PowerShell
+        run: |
+            choco install powershell --version=7.3.12 -y
+        if: runner.os == 'Windows'
+      - name: Verify Installation
+        run: |
+            pwsh -Command "$PSVersionTable.PSVersion"
+
       - name: Install specific version of Git (Windows)
         if: runner.os == 'Windows'
         run: |
