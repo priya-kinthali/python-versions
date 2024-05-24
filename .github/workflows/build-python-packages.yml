@@ -15,7 +15,7 @@ on:
       PLATFORMS:
         description: 'Platforms for execution in "os" or "os_arch" format (arch is "x64" by default)'
         required: true
-        default: 'ubuntu-20.04,ubuntu-22.04,ubuntu-24.04,macos-11_x64,macos-11_arm64,windows-2019_x64,windows-2019_x86'
+        default: 'setup-actions-windows-arm64-4-core_arm64'
   pull_request:
     paths-ignore:
     - 'versions-manifest.json'
@@ -39,7 +39,7 @@ jobs:
       - name: Generate execution matrix
         id: generate-matrix
         run: |
-          [String[]]$configurations = "${{ inputs.platforms || 'ubuntu-20.04,ubuntu-22.04,ubuntu-24.04,macos-11,macos-11_arm64,windows-2019_x64,windows-2019_x86' }}".Split(",").Trim()
+          [String[]]$configurations = "${{ inputs.platforms || 'setup-actions-windows-arm64-4-core_arm64' }}".Split(",").Trim()
           $matrix = @()
 
           foreach ($configuration in $configurations) {
@@ -69,6 +69,11 @@ jobs:
     env:
       ARTIFACT_NAME: python-${{ inputs.VERSION || '3.12.3' }}-${{ matrix.platform }}-${{ matrix.arch }}
     steps:
+
+      - name: Install specific version of Git (Windows)
+        if: runner.os == 'Windows'
+        run: |
+            choco install git --version=2.18.0
 
       - name: Check out repository code
         uses: actions/checkout@v4
