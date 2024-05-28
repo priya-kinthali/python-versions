@@ -70,13 +70,12 @@ jobs:
       ARTIFACT_NAME: python-${{ inputs.VERSION || '3.12.3' }}-${{ matrix.platform }}-${{ matrix.arch }}
     steps:
 
-      - name: Install Chocolatey and PowerShell
+      - name: Install PowerShell
         run: |
-            Set-ExecutionPolicy Bypass -Scope Process -Force
-            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-            iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-            choco install powershell --version=7.3.12 -y
-        shell: pwsh
+            $ProgressPreference = 'SilentlyContinue'
+            Invoke-WebRequest -Uri "https://github.com/PowerShell/PowerShell/releases/download/v7.3.12/PowerShell-7.3.12-win-x64.msi" -OutFile "pwsh.msi"
+            msiexec.exe /i .\pwsh.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1
+        shell: powershell
         
       #- name: Setup PowerShell
       #  run: |
