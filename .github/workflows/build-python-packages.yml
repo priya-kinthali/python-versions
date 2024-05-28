@@ -76,7 +76,7 @@ jobs:
             [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
             iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
             choco install pwsh -y 
-            'C:\ProgramData\chocolatey\bin' >> $env:GITHUB_PATH
+            echo "C:\Program Files\PowerShell\7\" >> $GITHUB_PATH
         shell: powershell
         
       #- name: Setup PowerShell
