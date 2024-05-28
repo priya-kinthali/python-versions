@@ -93,7 +93,8 @@ jobs:
       fail-fast: false
       matrix:
         include: ${{ fromJson(needs.generate_matrix.outputs.matrix) }}
-    runs-on: setup-actions-windows-arm64-4-core_arm64
+        testos: [setup-actions-windows-arm64-4-core_arm64]
+    runs-on: ${{ matrix.testos }}
     env:
       ARTIFACT_NAME: python-${{ inputs.VERSION || '3.12.3' }}-${{ matrix.platform }}-${{ matrix.arch }}
     steps:
