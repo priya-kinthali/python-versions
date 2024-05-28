@@ -70,6 +70,14 @@ jobs:
       ARTIFACT_NAME: python-${{ inputs.VERSION || '3.12.3' }}-${{ matrix.platform }}-${{ matrix.arch }}
     steps:
 
+      - name: Install Chocolatey and PowerShell
+        run: |
+            Set-ExecutionPolicy Bypass -Scope Process -Force
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+            iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+            choco install powershell --version=7.3.12 -y
+        shell: pwsh
+        
       #- name: Setup PowerShell
       #  run: |
       #      choco install powershell --version=7.3.12 -y
@@ -78,10 +86,10 @@ jobs:
       #  run: |
       #      pwsh -Command "$PSVersionTable.PSVersion"
 
-      #- name: Install specific version of Git (Windows)
-      #  if: runner.os == 'Windows'
-      #  run: |
-      #      choco install git --version=2.18.0
+      - name: Install specific version of Git (Windows)
+        if: runner.os == 'Windows'
+        run: |
+            choco install git --version=2.18.0
 
       - name: Check out repository code
         uses: actions/checkout@v4
