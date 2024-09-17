@@ -55,5 +55,8 @@ echo $PIP_ROOT_USER_ACTION
 ./python -m ensurepip
 ./python -m pip install --upgrade --force-reinstall pip --disable-pip-version-check --no-warn-script-location
 
+# Add this line to check the environment variable
+./python -c "import os; print('PIP_ROOT_USER_ACTION:', os.getenv('PIP_ROOT_USER_ACTION'))"
+
 echo "Create complete file"
 touch $PYTHON_TOOLCACHE_VERSION_PATH/$ARCH.complete
