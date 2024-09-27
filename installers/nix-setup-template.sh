@@ -48,18 +48,11 @@ if [ ! -f python ]; then
 fi
 
 chmod +x ../python $PYTHON_MAJOR $PYTHON_MAJOR_DOT_MINOR $PYTHON_MAJORMINOR python
-
 echo "Upgrading pip..."
-# export PIP_ROOT_USER_ACTION=ignore
-# echo $PIP_ROOT_USER_ACTION
-
+export PIP_ROOT_USER_ACTION=ignore
+echo $PIP_ROOT_USER_ACTION
 # ./python -m ensurepip
-# ./python -m pip install --upgrade --force-reinstall pip --disable-pip-version-check --no-warn-script-location --root-user-action=ignore
-PIP_ROOT_USER_ACTION=ignore ./python -m ensurepip
-PIP_ROOT_USER_ACTION=ignore ./python -m pip install --upgrade --force-reinstall pip --disable-pip-version-check --no-warn-script-location
-
-# # Add this line to check the environment variable
-# ./python -c "import os; print('PIP_ROOT_USER_ACTION:', os.getenv('PIP_ROOT_USER_ACTION'))"
+./python -m pip install --upgrade --force-reinstall pip --disable-pip-version-check --no-warn-script-location
 
 echo "Create complete file"
 touch $PYTHON_TOOLCACHE_VERSION_PATH/$ARCH.complete
