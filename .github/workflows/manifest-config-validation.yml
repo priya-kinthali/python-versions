@@ -2,7 +2,7 @@ name: Manifest config tests
 on: 
   pull_request:
     branches:
-      - test-ubuntu24
+      - main
     paths-ignore:
       - 'versions-manifest.json'
 
