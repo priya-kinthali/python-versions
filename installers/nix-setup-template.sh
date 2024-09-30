@@ -49,9 +49,10 @@ fi
 
 chmod +x ../python $PYTHON_MAJOR $PYTHON_MAJOR_DOT_MINOR $PYTHON_MAJORMINOR python
 echo "Upgrading pip..."
-# export PIP_ROOT_USER_ACTION=ignore
-# echo $PIP_ROOT_USER_ACTION
-# ./python -m ensurepip
+
+./python -m ensurepip
+export PIP_ROOT_USER_ACTION=ignore
+echo $PIP_ROOT_USER_ACTION
 ./python -m pip install --upgrade --force-reinstall pip --disable-pip-version-check --no-warn-script-location
 
 echo "Create complete file"
