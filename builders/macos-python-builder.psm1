@@ -81,6 +81,16 @@ class macOSPythonBuilder : NixPythonBuilder {
             }
 
             if ($this.Version -gt "3.7.12") {
+                # Ensure Tcl/Tk is installed via Homebrew
+                if (-not (brew list --versions tcl-tk)) {
+                    brew install tcl-tk
+                }
+                # Set environment variables for Tcl/Tk
+                $env:LDFLAGS += " -L$(brew --prefix tcl-tk)/lib"
+                $env:CFLAGS += " -I$(brew --prefix tcl-tk)/include"
+                $env:CPPFLAGS += " -I$(brew --prefix tcl-tk)/include"
+
+                # Update configure string
                 $configureString += " --with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'"
 	        }
 
