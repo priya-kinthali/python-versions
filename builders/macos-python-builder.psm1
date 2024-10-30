@@ -93,18 +93,11 @@ class macOSPythonBuilder : NixPythonBuilder {
                     }
                 } else {
                     Write-Host "Tcl/Tk is already installed."
+                        # Get the version of Tcl/Tk
+                         $tcltkVersion = brew info tcl-tk --json | ConvertFrom-Json | Select-Object -ExpandProperty versions | Select-Object -ExpandProperty stable
+                         Write-Host "Tcl/Tk version: $tcltkVersion"
+
                 }
-
-                # Set environment variables for Tcl/Tk
-                $env:LDFLAGS += " -L$(brew --prefix tcl-tk)/lib"
-                $env:CFLAGS += " -I$(brew --prefix tcl-tk)/include"
-                $env:CPPFLAGS += " -I$(brew --prefix tcl-tk)/include"
-
-                Write-Host "Environment variables set:"
-                Write-Host "LDFLAGS: $env:LDFLAGS"
-                Write-Host "CFLAGS: $env:CFLAGS"
-                Write-Host "CPPFLAGS: $env:CPPFLAGS"
-
                 # Update configure string
                 $configureString += " --with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'"
                 Write-Host "Updated configure string: $configureString"
