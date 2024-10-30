@@ -81,18 +81,34 @@ class macOSPythonBuilder : NixPythonBuilder {
             }
 
             if ($this.Version -gt "3.7.12") {
+                Write-Host "Python version is greater than 3.7.12, proceeding with Tcl/Tk setup."
+
                 # Ensure Tcl/Tk is installed via Homebrew
                 if (-not (brew list --versions tcl-tk)) {
+                    Write-Host "Tcl/Tk not found, installing via Homebrew."
                     brew install tcl-tk
+                    if ($LASTEXITCODE -ne 0) {
+                        Write-Error "Failed to install Tcl/Tk via Homebrew."
+                        exit $LASTEXITCODE
+                    }
+                } else {
+                    Write-Host "Tcl/Tk is already installed."
                 }
+
                 # Set environment variables for Tcl/Tk
                 $env:LDFLAGS += " -L$(brew --prefix tcl-tk)/lib"
                 $env:CFLAGS += " -I$(brew --prefix tcl-tk)/include"
                 $env:CPPFLAGS += " -I$(brew --prefix tcl-tk)/include"
 
+                Write-Host "Environment variables set:"
+                Write-Host "LDFLAGS: $env:LDFLAGS"
+                Write-Host "CFLAGS: $env:CFLAGS"
+                Write-Host "CPPFLAGS: $env:CPPFLAGS"
+
                 # Update configure string
                 $configureString += " --with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'"
-	        }
+                Write-Host "Updated configure string: $configureString"
+            }
 
             if ($this.Version -eq "3.7.17") {
                 $env:LDFLAGS += " -L$(brew --prefix bzip2)/lib -L$(brew --prefix readline)/lib -L$(brew --prefix ncurses)/lib"
