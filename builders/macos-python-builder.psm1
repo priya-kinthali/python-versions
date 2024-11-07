@@ -95,6 +95,11 @@ class macOSPythonBuilder : NixPythonBuilder {
                 $env:PKG_CONFIG_PATH = "/usr/local/opt/tcl-tk/lib/pkgconfig"
                 $env:CFLAGS += " -I$env:TCL_INCLUDE_PATH"
                 $env:PYTHON_CONFIGURE_OPTS = $configureString
+                Write-Host "LDFLAGS: $env:LDFLAGS"
+                Write-Host "CPPFLAGS: $env:CPPFLAGS"
+                Write-Host "PKG_CONFIG_PATH: $env:PKG_CONFIG_PATH"
+                Write-Host "CFLAGS: $env:CFLAGS"
+                Write-Host "PYTHON_CONFIGURE_OPTS: $env:PYTHON_CONFIGURE_OPTS"
             }
 
             if ($this.Version -eq "3.7.17") {
