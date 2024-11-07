@@ -84,12 +84,11 @@ class macOSPythonBuilder : NixPythonBuilder {
             #     $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
 	        # }
             if ($this.Version -gt "3.7.12") {
-                $env:LDFLAGS = "-L/usr/local/opt/tcl-tk/lib"
-                $env:CPPFLAGS = "-I/usr/local/opt/tcl-tk/include"
-                $env:PYTHON_CONFIGURE_OPTS = "--with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
-                
-                $configureString += " $env:PYTHON_CONFIGURE_OPTS"
-            }
+                # Install Tcl/Tk using Homebrew
+                brew install tcl-tk
+                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
+	        }
+
 
             if ($this.Version -eq "3.7.17") {
                 $env:LDFLAGS += " -L$(brew --prefix bzip2)/lib -L$(brew --prefix readline)/lib -L$(brew --prefix ncurses)/lib"
