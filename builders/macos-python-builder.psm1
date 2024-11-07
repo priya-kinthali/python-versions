@@ -84,22 +84,11 @@ class macOSPythonBuilder : NixPythonBuilder {
             #     $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
 	        # }
             if ($this.Version -gt "3.7.12") {
-                $env:TCL_INCLUDE_PATH = "/usr/local/opt/tcl-tk/include"
-                $env:TCL_LIBRARY_PATH = "/usr/local/opt/tcl-tk/lib"
-                $configureString += " --with-tcltk-includes='-I$env:TCL_INCLUDE_PATH' --with-tcltk-libs='-L$env:TCL_LIBRARY_PATH -ltcl8.6 -ltk8.6'"
-                $env:PYTHON_CONFIGURE_OPTS = $configureString
-
-                # Set environment variables
-                $env:LDFLAGS += " -L$env:TCL_LIBRARY_PATH"
-                $env:CPPFLAGS = "-I$env:TCL_INCLUDE_PATH"
-                $env:PKG_CONFIG_PATH = "/usr/local/opt/tcl-tk/lib/pkgconfig"
-                $env:CFLAGS += " -I$env:TCL_INCLUDE_PATH"
-                $env:PYTHON_CONFIGURE_OPTS = $configureString
-                Write-Host "LDFLAGS: $env:LDFLAGS"
-                Write-Host "CPPFLAGS: $env:CPPFLAGS"
-                Write-Host "PKG_CONFIG_PATH: $env:PKG_CONFIG_PATH"
-                Write-Host "CFLAGS: $env:CFLAGS"
-                Write-Host "PYTHON_CONFIGURE_OPTS: $env:PYTHON_CONFIGURE_OPTS"
+                $LDFLAGS = "-L/usr/local/opt/tcl-tk/lib"
+                $CPPFLAGS = "-I/usr/local/opt/tcl-tk/include"
+                $PYTHON_CONFIGURE_OPTS = "--with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
+                
+                $configureString += " $PYTHON_CONFIGURE_OPTS"
             }
 
             if ($this.Version -eq "3.7.17") {
