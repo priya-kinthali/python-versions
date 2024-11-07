@@ -84,11 +84,11 @@ class macOSPythonBuilder : NixPythonBuilder {
             #     $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
 	        # }
             if ($this.Version -gt "3.7.12") {
-                $LDFLAGS = "-L/usr/local/opt/tcl-tk/lib"
-                $CPPFLAGS = "-I/usr/local/opt/tcl-tk/include"
-                $PYTHON_CONFIGURE_OPTS = "--with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
+                $env:LDFLAGS = "-L/usr/local/opt/tcl-tk/lib"
+                $env:CPPFLAGS = "-I/usr/local/opt/tcl-tk/include"
+                $env:PYTHON_CONFIGURE_OPTS = "--with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
                 
-                $configureString += " $PYTHON_CONFIGURE_OPTS"
+                $configureString += " $env:PYTHON_CONFIGURE_OPTS"
             }
 
             if ($this.Version -eq "3.7.17") {
