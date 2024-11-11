@@ -83,8 +83,15 @@ class macOSPythonBuilder : NixPythonBuilder {
             # if ($this.Version -gt "3.7.12") {
             #     $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
             # }
+            # Function to get Tkinter TkVersion
+            function Get-TkinterVersion {
+                $pythonCommand = 'python -c "import tkinter; print(tkinter.TkVersion)"'
+                $tkVersion = & cmd /c $pythonCommand
+                return $tkVersion
+            }
+
             # Check Tkinter TkVersion before the if condition
-            $tkVersionBefore = [System.Diagnostics.FileVersionInfo]::GetVersionInfo((Get-Command python).Source).FileVersion
+            $tkVersionBefore = Get-TkinterVersion
             Write-Host "TkVersion before: $tkVersionBefore"
 
             if ($this.Version -gt "3.7.12") {
@@ -92,7 +99,7 @@ class macOSPythonBuilder : NixPythonBuilder {
             }
 
             # Check Tkinter TkVersion after the if condition
-            $tkVersionAfter = [System.Diagnostics.FileVersionInfo]::GetVersionInfo((Get-Command python).Source).FileVersion
+            $tkVersionAfter = Get-TkinterVersion
             Write-Host "TkVersion after: $tkVersionAfter"
 
 
