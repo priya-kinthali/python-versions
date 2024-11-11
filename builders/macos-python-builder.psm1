@@ -86,7 +86,7 @@ class macOSPythonBuilder : NixPythonBuilder {
             # Function to get Tkinter TkVersion
             function Get-TkinterVersion {
                 $pythonCommand = 'python -c "import tkinter; print(tkinter.TkVersion)"'
-                $tkVersion = & cmd /c $pythonCommand
+                $tkVersion = & sh -c $pythonCommand
                 return $tkVersion
             }
 
