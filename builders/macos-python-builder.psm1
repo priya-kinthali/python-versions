@@ -83,27 +83,10 @@ class macOSPythonBuilder : NixPythonBuilder {
             # if ($this.Version -gt "3.7.12") {
             #     $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
             # }
-            # Function to get Tkinter TkVersion
-            function Get-TkinterVersion {
-                $pythonCommand = 'python -c "import tkinter; print(tkinter.TkVersion)"'
-                $tkVersion = & sh -c $pythonCommand
-                return $tkVersion
-            }
-
-            # Check Tkinter TkVersion before the if condition
-            $tkVersionBefore = Get-TkinterVersion
-            Write-Host "TkVersion before: $tkVersionBefore"
-
             if ($this.Version -gt "3.7.12") {
-                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
+                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
             }
-
-            # Check Tkinter TkVersion after the if condition
-            $tkVersionAfter = Get-TkinterVersion
-            Write-Host "TkVersion after: $tkVersionAfter"
-
-
-
+            
             if ($this.Version -eq "3.7.17") {
                 $env:LDFLAGS += " -L$(brew --prefix bzip2)/lib -L$(brew --prefix readline)/lib -L$(brew --prefix ncurses)/lib"
                 $env:CFLAGS += " -I$(brew --prefix bzip2)/include -I$(brew --prefix readline)/include -I$(brew --prefix ncurses)/include"
