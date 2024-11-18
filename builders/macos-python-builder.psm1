@@ -81,11 +81,12 @@ class macOSPythonBuilder : NixPythonBuilder {
             }
 
             if ($this.Version -gt "3.7.12") {
-                # $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
+                
                 ### Compile with tkinter support
                 $tkinterInstallString = "brew install tcl-tk"
                 Execute-Command -Command "brew update"
                 Execute-Command -Command $tkinterInstallString
+                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl9.0 -ltk9.0'"
 	        }
 
             if ($this.Version -eq "3.7.17") {
