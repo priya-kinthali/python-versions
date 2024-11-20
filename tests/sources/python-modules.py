@@ -159,6 +159,7 @@ standard_library = [
     'threading',
     'timeit',
     'tkinter',
+    '_tkinter',
     'token',
     'tokenize',
     'trace',
@@ -260,7 +261,7 @@ if sys.version_info > (3, 8):
 if sys.version_info >= (3, 10):
     standard_library.remove('symbol')
     standard_library.remove('formatter')
-    standard_library.remove('tkinter')
+    # standard_library.remove('tkinter')
 
 # 'binhex' module has been removed from Python 3.11
 if sys.version_info >= (3, 11):
