@@ -80,14 +80,14 @@ class macOSPythonBuilder : NixPythonBuilder {
                 $env:CFLAGS = "-I/usr/local/opt/zlib/include"
             }
 
-            if ($this.Version -gt "3.7.12") {
+            # if ($this.Version -gt "3.7.12") {
                 
-                ### Compile with tkinter support
-                $tkinterInstallString = "brew install tcl-tk"
-                Execute-Command -Command "brew update"
-                Execute-Command -Command $tkinterInstallString
-                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl9.0 -ltk9.0'"
-	        }
+            #     ### Compile with tkinter support
+            #     $tkinterInstallString = "brew install tcl-tk"
+            #     Execute-Command -Command "brew update"
+            #     Execute-Command -Command $tkinterInstallString
+            #     $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl9.0 -ltk9.0'"
+	        # }
 
             if ($this.Version -eq "3.7.17") {
                 $env:LDFLAGS += " -L$(brew --prefix bzip2)/lib -L$(brew --prefix readline)/lib -L$(brew --prefix ncurses)/lib"
