@@ -84,6 +84,7 @@ jobs:
         run: |
           brew update
           brew install --cask powershell
+          echo "/usr/local/bin/pwsh" | sudo tee -a /etc/paths
       - name: Print Tcl/Tk version before update
         run: |
             echo 'puts [info patchlevel];exit 0' | tclsh
