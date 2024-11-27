@@ -81,10 +81,7 @@ class macOSPythonBuilder : NixPythonBuilder {
             }
 
             if ($this.Version -lt "3.10") {
-                # Detect the installed Tcl/Tk version dynamically
-                $tclVersion = & tclsh <<< 'puts [info patchlevel]'
-                $tkVersion = & wish <<< 'puts [info patchlevel]'
-                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl$tclVersion -ltk$tkVersion'"
+                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl9.0 -ltk9.0'"          
             }
             
             if ($this.Version -eq "3.7.17") {
