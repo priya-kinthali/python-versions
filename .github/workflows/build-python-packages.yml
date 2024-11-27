@@ -86,6 +86,9 @@ jobs:
           echo 'export PATH="/usr/local/microsoft/powershell/7:$PATH"' >> ~/.bash_profile
           echo 'export PATH="/usr/local/microsoft/powershell/7:$PATH"' >> ~/.zshrc
           source ~/.bash_profile || source ~/.zshrc
+          export PATH="/usr/local/microsoft/powershell/7:$PATH"
+          which pwsh
+          ls -la /usr/local/microsoft/powershell/7
       - name: Print Tcl/Tk version before update
         run: |
             echo 'puts [info patchlevel];exit 0' | tclsh
