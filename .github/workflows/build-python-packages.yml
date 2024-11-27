@@ -80,12 +80,12 @@ jobs:
     env:
       ARTIFACT_NAME: python-${{ inputs.VERSION || '3.12.3' }}-${{ matrix.platform }}-${{ matrix.arch }}
     steps:
-      - name: Install PowerShell
+      - name: Install PowerShell on macOS
         run: |
           brew update
           brew install --cask powershell
-          echo "/usr/local/bin/pwsh" | sudo tee -a /etc/paths
-          echo "/usr/local/bin" >> $GITHUB_PATH
+          echo 'export PATH="/usr/local/microsoft/powershell/7:$PATH"' >> ~/.zshrc
+          source ~/.zshrc
       - name: Print Tcl/Tk version before update
         run: |
             echo 'puts [info patchlevel];exit 0' | tclsh
