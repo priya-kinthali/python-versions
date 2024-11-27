@@ -85,7 +85,7 @@ jobs:
           brew update
           brew install --cask powershell
           echo "/usr/local/bin/pwsh" | sudo tee -a /etc/paths
-          export PATH="/usr/local/bin:$PATH"
+          echo 'export PATH="/usr/local/bin:$PATH"' >> $GITHUB_ENV
       - name: Print Tcl/Tk version before update
         run: |
             echo 'puts [info patchlevel];exit 0' | tclsh
