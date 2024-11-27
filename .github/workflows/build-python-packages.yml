@@ -83,6 +83,10 @@ jobs:
       - name: Install PowerShell
         run: |
           brew install --cask powershell
+          ls -la /usr/local/bin
+          ls -la /opt/homebrew/bin
+          find /usr/local -name pwsh 2>/dev/null
+          find /opt/homebrew -name pwsh 2>/dev/null
           find / -name pwsh 2>/dev/null
       - name: Print Tcl/Tk version before update
         run: |
