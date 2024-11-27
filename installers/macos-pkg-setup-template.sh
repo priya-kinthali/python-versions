@@ -70,6 +70,9 @@ chmod +x ../python $PYTHON_MAJOR $PYTHON_MAJOR_DOT_MINOR $PYTHON_MAJOR_MINOR pyt
 
 # Ensure OpenSSL is linked
 brew link openssl@3 --force
+# Echo the OpenSSL version
+echo "OpenSSL version:"
+/opt/homebrew/opt/openssl@3/bin/openssl version
 
 # Set environment variables for OpenSSL
 export LDFLAGS="-L/opt/homebrew/opt/openssl@3/lib"
