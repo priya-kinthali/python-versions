@@ -80,12 +80,6 @@ jobs:
     env:
       ARTIFACT_NAME: python-${{ inputs.VERSION || '3.12.3' }}-${{ matrix.platform }}-${{ matrix.arch }}
     steps:
-      - name: Install PowerShell
-        run: |
-          brew install --cask powershell
-          echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bash_profile
-          echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.zshrc
-          source ~/.bash_profile || source ~/.zshrc
       - name: Print Tcl/Tk version before update
         run: |
             echo 'puts [info patchlevel];exit 0' | tclsh
