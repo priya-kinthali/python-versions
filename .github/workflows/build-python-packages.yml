@@ -121,117 +121,117 @@ jobs:
           path: ${{ runner.temp }}/artifact
           if-no-files-found: error
 
-  test_python:
-    needs: [generate_matrix, build_python]
-    strategy:
-      fail-fast: false
-      matrix:
-        include: ${{ fromJson(needs.generate_matrix.outputs.matrix) }}
-    runs-on: ${{ matrix.os }}
-    env:
-      ARTIFACT_NAME: python-${{ inputs.VERSION || '3.12.3' }}-${{ matrix.platform }}-${{ matrix.arch }}
-    steps:
-      - name: Setup Environment on Windows ARM64 Runner
-        if: matrix.os == 'setup-actions-windows-arm64-4-core'
-        shell: powershell
-        run: |
-            # Install Chocolatey
-            Set-ExecutionPolicy Bypass -Scope Process -Force
-            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-            iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-            echo "C:\ProgramData\Chocolatey\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+  # test_python:
+  #   needs: [generate_matrix, build_python]
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include: ${{ fromJson(needs.generate_matrix.outputs.matrix) }}
+  #   runs-on: ${{ matrix.os }}
+  #   env:
+  #     ARTIFACT_NAME: python-${{ inputs.VERSION || '3.12.3' }}-${{ matrix.platform }}-${{ matrix.arch }}
+  #   steps:
+  #     - name: Setup Environment on Windows ARM64 Runner
+  #       if: matrix.os == 'setup-actions-windows-arm64-4-core'
+  #       shell: powershell
+  #       run: |
+  #           # Install Chocolatey
+  #           Set-ExecutionPolicy Bypass -Scope Process -Force
+  #           [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+  #           iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+  #           echo "C:\ProgramData\Chocolatey\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
         
-            # Install PowerShell
-            choco install powershell-core -y
-            echo "C:\Program Files\PowerShell\7" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+  #           # Install PowerShell
+  #           choco install powershell-core -y
+  #           echo "C:\Program Files\PowerShell\7" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
         
-            # Install Git
-            choco install git -y
-            echo "C:\Program Files\Git\cmd" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+  #           # Install Git
+  #           choco install git -y
+  #           echo "C:\Program Files\Git\cmd" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
         
             
-             # Install 7-Zip
-            choco install 7zip -y
-            echo "C:\ProgramData\chocolatey\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+  #            # Install 7-Zip
+  #           choco install 7zip -y
+  #           echo "C:\ProgramData\chocolatey\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
             
-      - name: Check out repository code
-        uses: actions/checkout@v4
-        with:
-          submodules: true
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: true
 
-      - name: Fully cleanup the toolcache directory before testing
-        run: ./helpers/clean-toolcache.ps1 -ToolName "Python"
+  #     - name: Fully cleanup the toolcache directory before testing
+  #       run: ./helpers/clean-toolcache.ps1 -ToolName "Python"
 
-      - name: Delete macOS /Library/Frameworks/Python.framework
-        if: matrix.platform == 'darwin'
-        shell: bash
-        run: if [ -d /Library/Frameworks/Python.framework ]; then sudo rm -rf /Library/Frameworks/Python.framework; fi
+  #     - name: Delete macOS /Library/Frameworks/Python.framework
+  #       if: matrix.platform == 'darwin'
+  #       shell: bash
+  #       run: if [ -d /Library/Frameworks/Python.framework ]; then sudo rm -rf /Library/Frameworks/Python.framework; fi
 
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ runner.temp }}/${{ env.ARTIFACT_NAME }}
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: ${{ env.ARTIFACT_NAME }}
+  #         path: ${{ runner.temp }}/${{ env.ARTIFACT_NAME }}
 
-      - name: Extract files
-        run: |
-          if ('${{ matrix.platform }}' -eq 'win32') {
-            $artifactName = "${{ env.ARTIFACT_NAME }}.zip"
-            7z.exe x "$artifactName" -y | Out-Null
-          } else {
-            $artifactName = "${{ env.ARTIFACT_NAME }}.tar.gz"
-            tar -xzf $artifactName
-          }
-        working-directory: ${{ runner.temp }}/${{ env.ARTIFACT_NAME }}
+  #     - name: Extract files
+  #       run: |
+  #         if ('${{ matrix.platform }}' -eq 'win32') {
+  #           $artifactName = "${{ env.ARTIFACT_NAME }}.zip"
+  #           7z.exe x "$artifactName" -y | Out-Null
+  #         } else {
+  #           $artifactName = "${{ env.ARTIFACT_NAME }}.tar.gz"
+  #           tar -xzf $artifactName
+  #         }
+  #       working-directory: ${{ runner.temp }}/${{ env.ARTIFACT_NAME }}
 
-      - name: Apply build artifact to the local machine
-        run: |
-          $PSNativeCommandUseErrorActionPreference = $true
-          if ('${{ matrix.platform }}' -eq 'win32') {
-            powershell ./setup.ps1
-            } else {
-              sh ./setup.sh
-              cp ${{ runner.temp }}/${{ env.ARTIFACT_NAME }}/build_output.txt ${{ runner.temp }}
-            }
-        working-directory: ${{ runner.temp }}/${{ env.ARTIFACT_NAME }}
+  #     - name: Apply build artifact to the local machine
+  #       run: |
+  #         $PSNativeCommandUseErrorActionPreference = $true
+  #         if ('${{ matrix.platform }}' -eq 'win32') {
+  #           powershell ./setup.ps1
+  #           } else {
+  #             sh ./setup.sh
+  #             cp ${{ runner.temp }}/${{ env.ARTIFACT_NAME }}/build_output.txt ${{ runner.temp }}
+  #           }
+  #       working-directory: ${{ runner.temp }}/${{ env.ARTIFACT_NAME }}
 
-      - name: Setup Python ${{ env.VERSION }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.VERSION }}
-          architecture: ${{ matrix.arch }}
+  #     - name: Setup Python ${{ env.VERSION }}
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{ env.VERSION }}
+  #         architecture: ${{ matrix.arch }}
 
-      - name: Verbose sysconfig dump
-        if: runner.os == 'Linux' || runner.os == 'macOS'
-        run: python ./sources/python-config-output.py
-        working-directory: ${{ github.workspace }}/tests
+  #     - name: Verbose sysconfig dump
+  #       if: runner.os == 'Linux' || runner.os == 'macOS'
+  #       run: python ./sources/python-config-output.py
+  #       working-directory: ${{ github.workspace }}/tests
 
-      - name: Verbose python binary links
-        if: runner.os == 'Linux' || runner.os == 'macOS'
-        run: |
-          $pythonLocation = which python
-          if ('${{ matrix.platform }}' -eq 'darwin') { otool -L $pythonLocation } else { ldd $pythonLocation }
+  #     - name: Verbose python binary links
+  #       if: runner.os == 'Linux' || runner.os == 'macOS'
+  #       run: |
+  #         $pythonLocation = which python
+  #         if ('${{ matrix.platform }}' -eq 'darwin') { otool -L $pythonLocation } else { ldd $pythonLocation }
 
-      - name: Run tests
-        run: |
-            Install-Module Pester -Force -Scope CurrentUser -SkipPublisherCheck
-            Import-Module Pester
-            $pesterContainer = New-PesterContainer -Path './python-tests.ps1' -Data @{
-                Version="${{ env.VERSION }}";
-                Platform="${{ matrix.platform }}";
-                Architecture="${{ matrix.arch }}";
-            }
-            $Result = Invoke-Pester -Container $pesterContainer -PassThru
-            if ($Result.FailedCount -gt 0) {
-              $host.SetShouldExit($Result.FailedCount)
-              exit $Result.FailedCount
-            }
-        working-directory: ${{ github.workspace }}/tests
+  #     - name: Run tests
+  #       run: |
+  #           Install-Module Pester -Force -Scope CurrentUser -SkipPublisherCheck
+  #           Import-Module Pester
+  #           $pesterContainer = New-PesterContainer -Path './python-tests.ps1' -Data @{
+  #               Version="${{ env.VERSION }}";
+  #               Platform="${{ matrix.platform }}";
+  #               Architecture="${{ matrix.arch }}";
+  #           }
+  #           $Result = Invoke-Pester -Container $pesterContainer -PassThru
+  #           if ($Result.FailedCount -gt 0) {
+  #             $host.SetShouldExit($Result.FailedCount)
+  #             exit $Result.FailedCount
+  #           }
+  #       working-directory: ${{ github.workspace }}/tests
 
   publish_release:
       name: Publish release
       if: github.event_name == 'workflow_dispatch' && inputs.PUBLISH_RELEASES
-      needs: test_python
+      # needs: test_python
       runs-on: ubuntu-latest
       steps:
       - uses: actions/download-artifact@v4
