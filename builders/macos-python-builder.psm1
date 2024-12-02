@@ -105,7 +105,7 @@ class macOSPythonBuilder : NixPythonBuilder {
             Write-Host "Verifying the version of OpenSSL being used..."
             openssl version | Write-Host
             if ($this.Version -lt "3.10") {
-                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
+                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl9.0 -ltk9.0'"
 	        }
 
             if ($this.Version -eq "3.7.17") {
