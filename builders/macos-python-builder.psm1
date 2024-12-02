@@ -79,7 +79,31 @@ class macOSPythonBuilder : NixPythonBuilder {
                 $env:LDFLAGS = "-L/usr/local/opt/zlib/lib"
                 $env:CFLAGS = "-I/usr/local/opt/zlib/include"
             }
+            # Install OpenSSL using Homebrew
+            Write-Host "Installing OpenSSL..."
+            brew install openssl@3
 
+            # Find the path to OpenSSL 3
+            Write-Host "Finding the path to OpenSSL 3..."
+            $OPENSSL3_PATH = $(brew --prefix openssl@3)
+            Write-Host "OpenSSL 3 path: $OPENSSL3_PATH"
+
+            # Add OpenSSL 3 to the PATH, so it's used by default
+            Write-Host "Adding OpenSSL 3 to the PATH..."
+            $env:PATH = "$OPENSSL3_PATH/bin;$env:PATH"
+
+            # Add OpenSSL 3 to the PKG_CONFIG_PATH, so pkg-config can find it
+            Write-Host "Adding OpenSSL 3 to the PKG_CONFIG_PATH..."
+            $env:PKG_CONFIG_PATH = "$OPENSSL3_PATH/lib/pkgconfig;$env:PKG_CONFIG_PATH"
+
+            # Add OpenSSL 3 to the LDFLAGS and CPPFLAGS, so the compiler can find it
+            Write-Host "Adding OpenSSL 3 to the LDFLAGS and CPPFLAGS..."
+            $env:LDFLAGS = "-L$OPENSSL3_PATH/lib $env:LDFLAGS"
+            $env:CPPFLAGS = "-I$OPENSSL3_PATH/include $env:CPPFLAGS"
+
+            # Verify the version of OpenSSL being used
+            Write-Host "Verifying the version of OpenSSL being used..."
+            openssl version | Write-Host
             if ($this.Version -lt "3.10") {
                 $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
 	        }
