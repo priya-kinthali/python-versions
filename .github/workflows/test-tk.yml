@@ -2,7 +2,7 @@ name: Test Python Tk
 on:
   push:
     branches:
-      - test-649
+      - test-selfhosted-tcl8
   workflow_dispatch:
 
 jobs:
