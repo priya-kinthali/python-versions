@@ -82,9 +82,9 @@ class macOSPythonBuilder : NixPythonBuilder {
             if ($this.Version -ge "3.8.0" -and $this.Version -lt "3.8.10") {
                 # Install zlib using Homebrew
                 Execute-Command -Command "brew install zlib"
-                $env:LDFLAGS = "-L/usr/local/opt/zlib/lib"
-                $env:CPPFLAGS = "-I/usr/local/opt/zlib/include"
-                $env:CFLAGS = "-I/usr/local/opt/zlib/include"
+                $env:LDFLAGS = "-L/usr/local/opt/openssl@3/lib -L/usr/local/opt/zlib/lib"
+                $env:CPPFLAGS = "-I/usr/local/opt/openssl@3/include -I/usr/local/opt/zlib/include"
+                $env:CFLAGS = "-I/usr/local/opt/openssl@3/include -I/usr/local/opt/zlib/include"
                 $env:PKG_CONFIG_PATH = "/usr/local/opt/zlib/lib/pkgconfig"
             }
 
