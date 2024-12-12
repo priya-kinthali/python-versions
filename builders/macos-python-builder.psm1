@@ -84,6 +84,11 @@ class macOSPythonBuilder : NixPythonBuilder {
                 Execute-Command -Command "brew install zlib"
                 $env:LDFLAGS = "-L/usr/local/opt/zlib/lib"
                 $env:CPPFLAGS = "-I/usr/local/opt/zlib/include"
+                if (-not $env:DYLD_LIBRARY_PATH) {
+                    $env:DYLD_LIBRARY_PATH = "/usr/local/opt/zlib/lib"
+                } else {
+                    $env:DYLD_LIBRARY_PATH = "/usr/local/opt/zlib/lib:$env:DYLD_LIBRARY_PATH"
+                }
             }
 
             # if ($this.Version -gt "3.7.12") {
