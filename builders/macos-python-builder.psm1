@@ -79,7 +79,7 @@ class macOSPythonBuilder : NixPythonBuilder {
                 $env:LDFLAGS = "-L/usr/local/opt/zlib/lib"
                 $env:CFLAGS = "-I/usr/local/opt/zlib/include"
             }
-            if ($this.Version -gt "3.8.1" -and $this.Version -lt "3.8.9") {
+            if ($this.Version -ge "3.8.0" -and $this.Version -lt "3.8.10") {
                 $env:LDFLAGS = "-L/usr/local/opt/zlib/lib"
                 $env:CFLAGS = "-I/usr/local/opt/zlib/include"
             }
