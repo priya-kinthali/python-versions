@@ -80,6 +80,8 @@ class macOSPythonBuilder : NixPythonBuilder {
                 $env:CFLAGS = "-I/usr/local/opt/zlib/include"
             }
             if ($this.Version -ge "3.8.0" -and $this.Version -lt "3.8.10") {
+                # Install zlib using Homebrew
+                Execute-Command -Command "brew install zlib"
                 $env:LDFLAGS = "-L/usr/local/opt/zlib/lib"
                 $env:CPPFLAGS = "-I/usr/local/opt/zlib/include"
             }
