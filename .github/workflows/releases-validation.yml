@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - sample-include-ubuntu24
     paths:
       - 'versions-manifest.json'
 
