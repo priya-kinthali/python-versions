@@ -76,5 +76,6 @@ export PIP_ROOT_USER_ACTION=ignore
 echo "Install OpenSSL certificates"
 sh -e "${PYTHON_APPLICATION_PATH}/Install Certificates.command"
 
+echo "This binary is getting generated from this macos-pkg file with framework: $PYTHON_FRAMEWORK_PATH"
 echo "Create complete file"
 touch $PYTHON_TOOLCACHE_VERSION_PATH/${ARCH}.complete

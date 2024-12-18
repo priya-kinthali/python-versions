@@ -54,5 +54,6 @@ export PIP_ROOT_USER_ACTION=ignore
 ./python -m ensurepip
 ./python -m pip install --upgrade --force-reinstall pip --disable-pip-version-check --no-warn-script-location
 
+echo "This binary is getting generated from this nix file without framework"
 echo "Create complete file"
 touch $PYTHON_TOOLCACHE_VERSION_PATH/$ARCH.complete
