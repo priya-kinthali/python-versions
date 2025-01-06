@@ -68,10 +68,10 @@ class macOSPythonBuilder : NixPythonBuilder {
         ### and then add the appropriate paths for the header and library files to configure command.
         ### Link to documentation (https://cpython-devguide.readthedocs.io/setup/#build-dependencies)
         if ($this.Version -lt "3.7.0") {
-            $env:LDFLAGS = "-L/usr/local/opt/openssl@3/lib -L/usr/local/opt/zlib/lib"
-            $env:CFLAGS = "-I/usr/local/opt/openssl@3/include -I/usr/local/opt/zlib/include"
+            $env:LDFLAGS = "-L/usr/local/opt/openssl@1.1/lib -L/usr/local/opt/zlib/lib"
+            $env:CFLAGS = "-I/usr/local/opt/openssl@1.1/include -I/usr/local/opt/zlib/include"
         } else {
-            $configureString += " --with-openssl=/usr/local/opt/openssl@3"
+            $configureString += " --with-openssl=/usr/local/opt/openssl@1.1"
 
             # For Python 3.7.2 and 3.7.3 we need to provide PATH for zlib to pack it properly. Otherwise the build will fail
             # with the error: zipimport.ZipImportError: can't decompress data; zlib not available
@@ -80,9 +80,9 @@ class macOSPythonBuilder : NixPythonBuilder {
                 $env:CFLAGS = "-I/usr/local/opt/zlib/include"
             }
 
-            # if ($this.Version -gt "3.7.12") {
-                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include/tcl-tk' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
-            # }
+            if ($this.Version -gt "3.7.12") {
+                $configureString += " --with-tcltk-includes='-I /usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'"
+	        }
 
             if ($this.Version -eq "3.7.17") {
                 $env:LDFLAGS += " -L$(brew --prefix bzip2)/lib -L$(brew --prefix readline)/lib -L$(brew --prefix ncurses)/lib"
@@ -151,6 +151,37 @@ class macOSPythonBuilder : NixPythonBuilder {
         return $pkgLocation
     }
 
+    [string] GetFrameworkName() {
+        <#
+        .SYNOPSIS
+        Get the Python installation Package name.
+        #>
+
+        if ($this.IsFreeThreaded()) {
+            return "PythonT.framework"
+        } else {
+            return "Python.framework"
+        }
+    }
+
+    [string] GetPkgChoices() {
+        <#
+        .SYNOPSIS
+        Reads the configuration XML file for the Python installer
+        #>
+
+        $config = if ($this.IsFreeThreaded()) { "freethreaded" } else { "default" }
+        $choicesFile = Join-Path $PSScriptRoot "../config/macos-pkg-choices-$($config).xml"
+        $choicesTemplate = Get-Content -Path $choicesFile -Raw
+
+        $variablesToReplace = @{
+            "{{__VERSION_MAJOR_MINOR__}}" = "$($this.Version.Major).$($this.Version.Minor)";
+        }
+
+        $variablesToReplace.keys | ForEach-Object { $choicesTemplate = $choicesTemplate.Replace($_, $variablesToReplace[$_]) }
+        return $choicesTemplate
+    }
+
     [void] CreateInstallationScriptPkg() {
         <#
         .SYNOPSIS
@@ -165,6 +196,8 @@ class macOSPythonBuilder : NixPythonBuilder {
             "{{__VERSION_FULL__}}" = $this.Version;
             "{{__PKG_NAME__}}" = $this.GetPkgName();
             "{{__ARCH__}}" = $this.Architecture;
+            "{{__FRAMEWORK_NAME__}}" = $this.GetFrameworkName();
+            "{{__PKG_CHOICES__}}" = $this.GetPkgChoices();
         }
 
         $variablesToReplace.keys | ForEach-Object { $installationTemplateContent = $installationTemplateContent.Replace($_, $variablesToReplace[$_]) }
