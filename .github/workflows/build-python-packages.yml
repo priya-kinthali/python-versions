@@ -71,8 +71,10 @@ jobs:
 
               if ($buildMode -eq "freethreaded") {
                 if ([semver]"${{ inputs.VERSION }}" -lt [semver]"3.13.0") {
+                  Write-Host "Version ${{ inputs.VERSION }} is less than 3.13.0, skipping freethreaded"
                   continue;
                 }
+                Write-Host "Version ${{ inputs.VERSION }} is greater than or equal to 3.13.0, adding freethreaded"
                 $arch += "-freethreaded"
               }
 
