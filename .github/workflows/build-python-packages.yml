@@ -76,6 +76,7 @@ jobs:
                 }
                 Write-Host "Version ${{ inputs.VERSION }} is greater than or equal to 3.13.0, adding freethreaded"
                 $arch += "-freethreaded"
+                Write-Host "Final arch value: $arch"
               }
 
               $matrix += @{
