@@ -1,5 +1,5 @@
 {
-    "regex": "python-\\d+\\.\\d+\\.\\d+-(\\w+\\.\\d+)?-?(\\w+)-(\\d+\\.\\d+)?-?((x|arm)\\d+(-freethreaded)?)",
+    "regex": "python-\\d+\\.\\d+\\.\\d+-([^-]+)-(\\d+\\.\\d+)-((x|arm)\\d+(-freethreaded)?)",
     "groups": {
         "arch": 4,
         "platform": 2,
