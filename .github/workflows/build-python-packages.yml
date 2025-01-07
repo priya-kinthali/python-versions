@@ -220,7 +220,7 @@ jobs:
         run: python -VVV
 
       - name: Verbose sysconfig dump
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+        # if: runner.os == 'Linux' || runner.os == 'macOS'
         run: python ./sources/python-config-output.py
         working-directory: ${{ github.workspace }}/tests
 
