@@ -5,7 +5,7 @@ function Invoke-Workflow {
     )
     
     $payload = @{
-        "ref" = "test-free-new"
+        "ref" = "main"
         "inputs" = @{
             "VERSION" = "$Version"
             "PUBLISH_RELEASES" = "$PublishRelease"
