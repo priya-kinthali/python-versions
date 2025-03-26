@@ -308,5 +308,5 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             workflow_id: 'create-pr.yml',
-            ref: 'main'
+            ref: 'test-330-pr'
           });
