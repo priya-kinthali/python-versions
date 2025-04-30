@@ -135,6 +135,9 @@ if ($IsFreeThreaded) {
     # Delete python.exe and create a symlink to free-threaded exe
     Remove-Item -Path "$PythonArchPath\python.exe" -Force
     New-Item -Path "$PythonArchPath\python.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe"
+} else {
+    # Create a minor version symlink to python.exe
+    New-Item -Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
 }
 
 Write-Host "Create `python3` symlink"
