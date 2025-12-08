@@ -126,13 +126,28 @@ if ($LASTEXITCODE -ne 0) {
     Throw "Error happened during Python installation"
 }
 
+# if ($IsFreeThreaded) {
+#     # Delete python.exe and create a symlink to free-threaded exe
+#     Remove-Item -Path "$PythonArchPath\python.exe" -Force
+#     New-Item -Path "$PythonArchPath\python.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe"
+# } else {
+#     # Create a minor version symlink to python.exe
+#     New-Item -Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
+# }
 if ($IsFreeThreaded) {
-    # Delete python.exe and create a symlink to free-threaded exe
-    Remove-Item -Path "$PythonArchPath\python.exe" -Force
-    New-Item -Path "$PythonArchPath\python.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe"
+    # Only remove/link if original file present
+    if (Test-Path "$PythonArchPath\python.exe") {
+        Remove-Item -Path "$PythonArchPath\python.exe" -Force
+    }
+    # Only create symlink to .t.exe if it exists
+    if (Test-Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe") {
+        New-Item -Path "$PythonArchPath\python.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe"
+    }
 } else {
-    # Create a minor version symlink to python.exe
-    New-Item -Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
+    # Only create minor version symlink to python.exe if it exists
+    if (Test-Path "$PythonArchPath\python.exe") {
+        New-Item -Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
+    }
 }
 
 Write-Host "Create `python3` symlink"
