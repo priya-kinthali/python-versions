@@ -130,6 +130,10 @@ Write-Host "List of files in $PythonArchPath after extraction:"
 Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
 $BaseExe = Join-Path $PythonArchPath "python.exe"
 if (($Architecture -match "arm") -and (-not (Test-Path $BaseExe))) {
+    # If python.exe exists as a broken symlink or previous file, forcibly remove it first (prevents hang!)
+    if (Test-Path $BaseExe -PathType Leaf) {
+        Remove-Item -Path $BaseExe -Force
+    }
     # Try linking python.exe from python-*.exe (ex: python-3.14.2-arm64.exe)
     $RealArmExe = Get-ChildItem $PythonArchPath -Filter "python-*.exe" | Select-Object -First 1
     if ($null -ne $RealArmExe) {
