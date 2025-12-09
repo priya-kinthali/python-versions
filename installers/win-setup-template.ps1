@@ -137,26 +137,35 @@ if ($LASTEXITCODE -ne 0) {
 if ($IsFreeThreaded) {
     # Only remove/link if original file present
     if (Test-Path "$PythonArchPath\python.exe") {
+        Write-Host "Found: $PythonArchPath\python.exe - Removing..."
         Remove-Item -Path "$PythonArchPath\python.exe" -Force
+        Write-Host "Removed: $PythonArchPath\python.exe"
     }
     # Only create symlink to .t.exe if it exists
     if (Test-Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe") {
+        Write-Host "Found: $PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe - Creating symlink"
         New-Item -Path "$PythonArchPath\python.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe"
+        Write-Host "Symlink created: $PythonArchPath\python.exe -> $PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe"
     }
 } else {
     # Only create minor version symlink to python.exe if it exists
     if (Test-Path "$PythonArchPath\python.exe") {
+        Write-Host "Found: $PythonArchPath\python.exe - Creating symlink"
         New-Item -Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
+        Write-Host "Symlink created: $PythonArchPath\python${MajorVersion}.${MinorVersion}.exe -> $PythonArchPath\python.exe"
     }
 }
 
 # Create python3 symlink only if python.exe exists
 if (Test-Path "$PythonArchPath\python.exe") {
+    Write-Host "Found: $PythonArchPath\python.exe - Creating symlink python3.exe -> python.exe"
     New-Item -Path "$PythonArchPath\python3.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
+    Write-Host "Symlink created: $PythonArchPath\python3.exe -> $PythonArchPath\python.exe"
 }
 
 Write-Host "Install and upgrade Pip"
 $Env:PIP_ROOT_USER_ACTION = "ignore"
+Write-Host "Joining path: Base = $PythonArchPath, Child = python.exe"
 $PythonExePath = Join-Path -Path $PythonArchPath -ChildPath "python.exe"
 cmd.exe /c "$PythonExePath -m ensurepip && $PythonExePath -m pip install --upgrade --force-reinstall pip --no-warn-script-location"
 if ($LASTEXITCODE -ne 0) {
