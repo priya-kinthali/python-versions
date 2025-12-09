@@ -115,22 +115,8 @@ Remove-RegistryEntries -Architecture $Architecture -MajorVersion $MajorVersion -
 Write-Host "Create Python $Version folder in $PythonToolcachePath"
 New-Item -ItemType Directory -Path $PythonArchPath -Force | Out-Null
 
-# Write-Host "Copy Python binaries to $PythonArchPath"
-# Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath | Out-Null
-
-$IsZip = $PythonExecName.ToLower().EndsWith(".zip")
-if ($IsZip) {
-    Write-Host "Extracting $PythonExecName to $PythonArchPath"
-    Expand-Archive -Path $PythonExecName -DestinationPath $PythonArchPath -Force
-    Write-Host "Files in $PythonArchPath after extraction:"
-    Get-ChildItem -Path "$PythonArchPath" -Recurse | ForEach-Object { $_.FullName }
-} else {
-    Write-Host "Copy Python binaries to $PythonArchPath"
-    $copiedItems = Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath -PassThru
-    foreach ($item in $copiedItems) {
-        Write-Host "Copied: $($item.FullName)"
-    }
-}
+Write-Host "Copy Python binaries to $PythonArchPath"
+Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath | Out-Null
 
 Write-Host "Install Python $Version in $PythonToolcachePath..."
 $ExecParams = Get-ExecParams -IsMSI $IsMSI -IsFreeThreaded $IsFreeThreaded -PythonArchPath $PythonArchPath
@@ -142,6 +128,17 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "List of files in $PythonArchPath after extraction:"
 Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
+$BaseExe = Join-Path $PythonArchPath "python.exe"
+if (($Architecture -match "arm") -and (-not (Test-Path $BaseExe))) {
+    # Try linking python.exe from python-*.exe (ex: python-3.14.2-arm64.exe)
+    $RealArmExe = Get-ChildItem $PythonArchPath -Filter "python-*.exe" | Select-Object -First 1
+    if ($null -ne $RealArmExe) {
+        New-Item -Path $BaseExe -ItemType SymbolicLink -Value $RealArmExe.FullName
+        Write-Host "Created symlink: $BaseExe → $($RealArmExe.FullName)"
+    } else {
+        Write-Host "Could not find a real ARM exe to link as python.exe!"
+    }
+}
 if ($IsFreeThreaded) {
     # Delete python.exe and create a symlink to free-threaded exe
     Remove-Item -Path "$PythonArchPath\python.exe" -Force
