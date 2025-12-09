@@ -150,8 +150,10 @@ if ($IsFreeThreaded) {
     }
 }
 
-Write-Host "Create `python3` symlink"
-New-Item -Path "$PythonArchPath\python3.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
+# Create python3 symlink only if python.exe exists
+if (Test-Path "$PythonArchPath\python.exe") {
+    New-Item -Path "$PythonArchPath\python3.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
+}
 
 Write-Host "Install and upgrade Pip"
 $Env:PIP_ROOT_USER_ACTION = "ignore"
