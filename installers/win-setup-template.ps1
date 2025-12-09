@@ -128,40 +128,17 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "List of files in $PythonArchPath after extraction:"
 Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
-if (-not (Test-Path "$PythonArchPath\python.exe")) {
-    $candidate = Get-ChildItem -Path $PythonArchPath -Filter "python*.exe" | Where-Object { $_.Name -ne "python.exe" } | Select-Object -First 1
-    if ($null -ne $candidate) {
-        Copy-Item -Path $candidate.FullName -Destination "$PythonArchPath\python.exe"
-    }
-}
 if ($IsFreeThreaded) {
-    # Only remove/link if original file present
-    if (Test-Path "$PythonArchPath\python.exe") {
-        Write-Host "Found: $PythonArchPath\python.exe - Removing..."
-        Remove-Item -Path "$PythonArchPath\python.exe" -Force
-        Write-Host "Removed: $PythonArchPath\python.exe"
-    }
-    # Only create symlink to .t.exe if it exists
-    if (Test-Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe") {
-        Write-Host "Found: $PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe - Creating symlink"
-        New-Item -Path "$PythonArchPath\python.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe"
-        Write-Host "Symlink created: $PythonArchPath\python.exe -> $PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe"
-    }
+    # Delete python.exe and create a symlink to free-threaded exe
+    Remove-Item -Path "$PythonArchPath\python.exe" -Force
+    New-Item -Path "$PythonArchPath\python.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python${MajorVersion}.${MinorVersion}t.exe"
 } else {
     # Only create minor version symlink to python.exe if it exists
-    if (Test-Path "$PythonArchPath\python.exe") {
-        Write-Host "Found: $PythonArchPath\python.exe - Creating symlink"
-        New-Item -Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
-        Write-Host "Symlink created: $PythonArchPath\python${MajorVersion}.${MinorVersion}.exe -> $PythonArchPath\python.exe"
-    }
+    New-Item -Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
 }
 
-# Create python3 symlink only if python.exe exists
-if (Test-Path "$PythonArchPath\python.exe") {
-    Write-Host "Found: $PythonArchPath\python.exe - Creating symlink python3.exe -> python.exe"
-    New-Item -Path "$PythonArchPath\python3.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
-    Write-Host "Symlink created: $PythonArchPath\python3.exe -> $PythonArchPath\python.exe"
-}
+Write-Host "Create `python3` symlink"
+New-Item -Path "$PythonArchPath\python3.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
 
 Write-Host "Install and upgrade Pip"
 $Env:PIP_ROOT_USER_ACTION = "ignore"
