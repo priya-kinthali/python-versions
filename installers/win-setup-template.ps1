@@ -118,10 +118,18 @@ New-Item -ItemType Directory -Path $PythonArchPath -Force | Out-Null
 # Write-Host "Copy Python binaries to $PythonArchPath"
 # Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath | Out-Null
 
-Write-Host "Copy Python binaries to $PythonArchPath"
-$copiedItems = Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath -PassThru
-foreach ($item in $copiedItems) {
-    Write-Host "Copied: $($item.FullName)"
+$IsZip = $PythonExecName.ToLower().EndsWith(".zip")
+if ($IsZip) {
+    Write-Host "Extracting $PythonExecName to $PythonArchPath"
+    Expand-Archive -Path $PythonExecName -DestinationPath $PythonArchPath -Force
+    Write-Host "Files in $PythonArchPath after extraction:"
+    Get-ChildItem -Path "$PythonArchPath" -Recurse | ForEach-Object { $_.FullName }
+} else {
+    Write-Host "Copy Python binaries to $PythonArchPath"
+    $copiedItems = Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath -PassThru
+    foreach ($item in $copiedItems) {
+        Write-Host "Copied: $($item.FullName)"
+    }
 }
 
 Write-Host "Install Python $Version in $PythonToolcachePath..."
