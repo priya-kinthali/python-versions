@@ -134,6 +134,8 @@ if ($LASTEXITCODE -ne 0) {
 #     # Create a minor version symlink to python.exe
 #     New-Item -Path "$PythonArchPath\python${MajorVersion}.${MinorVersion}.exe" -ItemType SymbolicLink -Value "$PythonArchPath\python.exe"
 # }
+Write-Host "List of files in $PythonArchPath after extraction:"
+Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
 if ($IsFreeThreaded) {
     # Only remove/link if original file present
     if (Test-Path "$PythonArchPath\python.exe") {
