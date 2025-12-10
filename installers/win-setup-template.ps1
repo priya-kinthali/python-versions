@@ -76,15 +76,6 @@ if ([string]::IsNullOrEmpty($ToolcacheRoot)) {
 }
 $PythonToolcachePath = Join-Path -Path $ToolcacheRoot -ChildPath "Python"
 $PythonVersionPath = Join-Path -Path $PythonToolcachePath -ChildPath $Version
-Write-Host "ARCH PATH to delete: $PythonArchPath"
-Write-Host "Does ARCH PATH exist before create? " + (Test-Path $PythonArchPath)
-Write-Host "Does PARENT PATH exist before create? " + (Test-Path $PythonVersionPath)
-if ($Architecture -like "*arm64*") {
-    if (Test-Path $PythonVersionPath) {
-        Write-Host "Deleting $PythonVersionPath and all contained archs before ARM install"
-        Remove-Item -Path $PythonVersionPath -Recurse -Force
-    }
-}
 $PythonArchPath = Join-Path -Path $PythonVersionPath -ChildPath $Architecture
 
 $IsMSI = $PythonExecName -match "msi"
