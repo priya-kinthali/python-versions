@@ -125,6 +125,8 @@ cmd.exe /c "cd $PythonArchPath && call $PythonExecName $ExecParams /quiet"
 if ($LASTEXITCODE -ne 0) {
     Throw "Error happened during Python installation"
 }
+# Add a brief delay to let installer finish writing all files
+Start-Sleep -Seconds 5
 
 Write-Host "List of files in $PythonArchPath after extraction:"
 Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
