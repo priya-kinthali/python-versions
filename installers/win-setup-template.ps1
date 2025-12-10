@@ -116,7 +116,8 @@ Write-Host "Create Python $Version folder in $PythonToolcachePath"
 New-Item -ItemType Directory -Path $PythonArchPath -Force | Out-Null
 
 Write-Host "Copy Python binaries to $PythonArchPath"
-Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath | Out-Null
+# Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath | Out-Null
+Expand-Archive -LiteralPath ./$PythonExecName -DestinationPath $PythonArchPath -Force
 
 Write-Host "Install Python $Version in $PythonToolcachePath..."
 $ExecParams = Get-ExecParams -IsMSI $IsMSI -IsFreeThreaded $IsFreeThreaded -PythonArchPath $PythonArchPath
@@ -125,8 +126,6 @@ cmd.exe /c "cd $PythonArchPath && call $PythonExecName $ExecParams /quiet"
 if ($LASTEXITCODE -ne 0) {
     Throw "Error happened during Python installation"
 }
-# Add a brief delay to let installer finish writing all files
-Start-Sleep -Seconds 5
 
 Write-Host "List of files in $PythonArchPath after extraction:"
 Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
