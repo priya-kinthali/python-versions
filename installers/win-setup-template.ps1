@@ -78,16 +78,6 @@ $PythonToolcachePath = Join-Path -Path $ToolcacheRoot -ChildPath "Python"
 $PythonVersionPath = Join-Path -Path $PythonToolcachePath -ChildPath $Version
 $PythonArchPath = Join-Path -Path $PythonVersionPath -ChildPath $Architecture
 
-if ($Architecture -like "*arm64*") {
-    if (Test-Path $PythonArchPath) {
-        Write-Host "[ARM-PATCH] Purging $PythonArchPath before extraction to avoid leftover files."
-        Remove-Item -Path $PythonArchPath -Recurse -Force
-        Write-Host "[ARM-PATCH] Confirmed deleted: $(if (Test-Path $PythonArchPath) { "FAILED" } else { "SUCCESS" })"
-    } else {
-        Write-Host "[ARM-PATCH] $PythonArchPath did not exist, nothing to delete."
-    }
-}
-
 $IsMSI = $PythonExecName -match "msi"
 $IsFreeThreaded = $Architecture -match "-freethreaded"
 
@@ -121,6 +111,11 @@ if ($null -ne $InstalledVersions) {
 
 Write-Host "Remove registry entries for Python ${MajorVersion}.${MinorVersion}(${Architecture})..."
 Remove-RegistryEntries -Architecture $Architecture -MajorVersion $MajorVersion -MinorVersion $MinorVersion
+
+if (Test-Path $PythonArchPath) {
+    Write-Host "Deleting old $PythonArchPath before installation"
+    Remove-Item -Path $PythonArchPath -Recurse -Force
+}
 
 Write-Host "Create Python $Version folder in $PythonToolcachePath"
 New-Item -ItemType Directory -Path $PythonArchPath -Force | Out-Null
