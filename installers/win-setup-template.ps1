@@ -115,16 +115,31 @@ Remove-RegistryEntries -Architecture $Architecture -MajorVersion $MajorVersion -
 Write-Host "Create Python $Version folder in $PythonToolcachePath"
 New-Item -ItemType Directory -Path $PythonArchPath -Force | Out-Null
 
-Get-ChildItem -Path $PythonArchPath | Select-Object FullName
+Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
 Write-Host "Copy Python binaries to $PythonArchPath"
 Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath | Out-Null
-Get-ChildItem -Path $PythonArchPath | Select-Object FullName
+Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
 
 Write-Host "Install Python $Version in $PythonToolcachePath..."
 $ExecParams = Get-ExecParams -IsMSI $IsMSI -IsFreeThreaded $IsFreeThreaded -PythonArchPath $PythonArchPath
 
 cmd.exe /c "cd $PythonArchPath && call $PythonExecName $ExecParams /quiet"
+# if ($LASTEXITCODE -ne 0) {
+#     Throw "Error happened during Python installation"
+# }
+Write-Host "Contents of $PythonArchPath after install:"
+Get-ChildItem $PythonArchPath | Write-Host
+
+Write-Host "The value of IsMSI is: $IsMSI"
+$PythonExePath = Join-Path -Path $PythonArchPath -ChildPath "python.exe"
+if (Test-Path $PythonExePath) {
+    Write-Host "python.exe is present at $PythonExePath"
+} else {
+    Write-Host "python.exe is NOT present at $PythonExePath"
+}
 if ($LASTEXITCODE -ne 0) {
+    Write-Host "Python installation failed with exit code $LASTEXITCODE"
+    Write-Host "Executed: cd $PythonArchPath && call $PythonExecName $ExecParams /quiet"
     Throw "Error happened during Python installation"
 }
 
