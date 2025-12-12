@@ -115,9 +115,10 @@ Remove-RegistryEntries -Architecture $Architecture -MajorVersion $MajorVersion -
 Write-Host "Create Python $Version folder in $PythonToolcachePath"
 New-Item -ItemType Directory -Path $PythonArchPath -Force | Out-Null
 
+Get-ChildItem -Path $PythonArchPath | Select-Object FullName
 Write-Host "Copy Python binaries to $PythonArchPath"
 Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath | Out-Null
-
+Get-ChildItem -Path $PythonArchPath | Select-Object FullName
 
 Write-Host "Install Python $Version in $PythonToolcachePath..."
 $ExecParams = Get-ExecParams -IsMSI $IsMSI -IsFreeThreaded $IsFreeThreaded -PythonArchPath $PythonArchPath
