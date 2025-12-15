@@ -115,10 +115,24 @@ Remove-RegistryEntries -Architecture $Architecture -MajorVersion $MajorVersion -
 Write-Host "Create Python $Version folder in $PythonToolcachePath"
 New-Item -ItemType Directory -Path $PythonArchPath -Force | Out-Null
 
-Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
-Write-Host "Copy Python binaries to $PythonArchPath"
-Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath | Out-Null
-Get-ChildItem -Path "$PythonArchPath" | ForEach-Object { $_.FullName }
+Write-Host "Listing contents of $PythonArchPath before copy:"
+$itemsBefore = Get-ChildItem -Path "$PythonArchPath" -ErrorAction SilentlyContinue
+if ($itemsBefore) {
+    $itemsBefore | ForEach-Object { Write-Host $_.FullName }
+} else {
+    Write-Host "(No items found or path does not exist)"
+}
+
+Write-Host "Copying Python binaries to $PythonArchPath"
+Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath -ErrorAction Stop
+
+Write-Host "Listing contents of $PythonArchPath after copy:"
+$itemsAfter = Get-ChildItem -Path "$PythonArchPath" -ErrorAction SilentlyContinue
+if ($itemsAfter) {
+    $itemsAfter | ForEach-Object { Write-Host $_.FullName }
+} else {
+    Write-Host "(No items found or path does not exist)"
+}
 
 Write-Host "Install Python $Version in $PythonToolcachePath..."
 $ExecParams = Get-ExecParams -IsMSI $IsMSI -IsFreeThreaded $IsFreeThreaded -PythonArchPath $PythonArchPath
