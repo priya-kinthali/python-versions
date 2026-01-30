@@ -73,8 +73,8 @@ class NixPythonBuilder : PythonBuilder {
         $sourceUri = $this.GetSourceUri()
         Write-Host "Sources URI: $sourceUri"
 
-        $archiveFilepath = Download-File -Uri $sourceUri -OutputFolder $this.TempFolderLocation
-        Write-Host "Archive file path: $archiveFilepath"
+        $archiveFilepath = Download-File -Uri $sourceUri -OutputFolder $this.WorkFolderLocation
+        # Write-Host "Archive file path: $archiveFilepath"
         $expandedSourceLocation = Join-Path -Path $this.TempFolderLocation -ChildPath "SourceCode"
         New-Item -Path $expandedSourceLocation -ItemType Directory
 
@@ -115,7 +115,9 @@ class NixPythonBuilder : PythonBuilder {
         Write-Debug "make Python $($this.Version)-$($this.Architecture) $($this.Platform)"
         $buildOutputLocation = New-Item -Path $this.WorkFolderLocation -Name "build_output.txt" -ItemType File
         
-        Execute-Command -Command "make 2>&1 | tee $buildOutputLocation" -ErrorAction Continue
+        # Execute-Command -Command "make 2>&1 | tee $buildOutputLocation" -ErrorAction Continue
+        Execute-Command -Command "make -j $([Environment]::ProcessorCount) 2>&1 | tee $buildOutputLocation" -ErrorAction Continue
+        Write-Host "Processor count: $([Environment]::ProcessorCount)"
         Execute-Command -Command "make install" -ErrorAction Continue
 
         Write-Debug "Done; Make log location: $buildOutputLocation"
