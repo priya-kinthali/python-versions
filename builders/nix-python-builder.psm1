@@ -126,6 +126,8 @@ class NixPythonBuilder : PythonBuilder {
         Execute-Command -Command "make 2>&1 | tee $buildOutputLocation" -ErrorAction Continue
         Execute-Command -Command "make install" -ErrorAction Continue
 
+        $result = $this.DebugBz2Linkage()
+        Write-Host "DebugBz2Linkage output: $result"
         Write-Debug "Done; Make log location: $buildOutputLocation"
     }
 
