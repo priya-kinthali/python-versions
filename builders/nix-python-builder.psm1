@@ -74,10 +74,19 @@ class NixPythonBuilder : PythonBuilder {
         Write-Host "Sources URI: $sourceUri"
 
         $archiveFilepath = Download-File -Uri $sourceUri -OutputFolder $this.WorkFolderLocation
+        Write-Host "archiveFilepath = $archiveFilepath"
+
         $expandedSourceLocation = Join-Path -Path $this.TempFolderLocation -ChildPath "SourceCode"
+        Write-Host "expandedSourceLocation = $expandedSourceLocation"
+
         New-Item -Path $expandedSourceLocation -ItemType Directory
+        Write-Host "Created directory at $expandedSourceLocation"
+
 
         Extract-TarArchive -ArchivePath $archiveFilepath -OutputDirectory $expandedSourceLocation
+        Write-Host "Extracted $archiveFilepath to $expandedSourceLocation"
+        Write-Host "Download done"
+
         Write-Debug "Done; Sources location: $expandedSourceLocation"
 
         return $expandedSourceLocation
