@@ -112,33 +112,34 @@ jobs:
           echo "AGENT_TOOLSDIRECTORY=${AGENT_TOOLSDIRECTORY:-}"
           echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-}"
 
-          echo "== Find python in common toolcache locations =="
+          echo "== Find built python (exclude *-config) =="
           SEARCH_DIRS=()
           [ -n "${RUNNER_TOOL_CACHE:-}" ] && SEARCH_DIRS+=("$RUNNER_TOOL_CACHE")
           [ -n "${AGENT_TOOLSDIRECTORY:-}" ] && SEARCH_DIRS+=("$AGENT_TOOLSDIRECTORY")
           SEARCH_DIRS+=("/opt/hostedtoolcache" "/opt" "/usr/local" "$GITHUB_WORKSPACE")
 
-          for d in "${SEARCH_DIRS[@]}"; do
-            [ -d "$d" ] && echo "will search: $d"
-          done
-
           PYBIN=""
           for d in "${SEARCH_DIRS[@]}"; do
-            if [ -d "$d" ]; then
-              PYBIN="$(find "$d" -type f -executable \
-                \( -path '*/bin/python3' -o -path '*/bin/python3.*' -o -path '*/bin/python' \) \
-                2>/dev/null | head -n 1 || true)"
-              if [ -n "$PYBIN" ]; then
-                break
+            [ -d "$d" ] || continue
+            # candidates: .../bin/python, .../bin/python3, .../bin/python3.13, etc (but not python*-config)
+            while IFS= read -r cand; do
+              case "$cand" in
+                *-config) continue ;;
+              esac
+              if "$cand" -c "import sys; print(sys.executable)" >/dev/null 2>&1; then
+                PYBIN="$cand"
+                break 2
               fi
-            fi
+            done < <(find "$d" -type f -executable \
+              \( -path '*/bin/python' -o -path '*/bin/python3' -o -path '*/bin/python3.*' \) \
+              2>/dev/null | head -n 200)
           done
 
           echo "PYBIN=$PYBIN"
           test -n "$PYBIN"
 
-          echo "== Python version =="
-          "$PYBIN" -c "import sys; print(sys.version)"
+          echo "== Python version/executable =="
+          "$PYBIN" -c "import sys; print(sys.version); print('exe:', sys.executable)"
 
           echo "== _bz2 extension location =="
           "$PYBIN" -c "import _bz2; print(_bz2.__file__)"
@@ -147,6 +148,9 @@ jobs:
           BZ2SO="$("$PYBIN" -c "import _bz2; print(_bz2.__file__)")"
           ldd "$BZ2SO" | tee ldd__bz2.txt
           grep -E 'libbz2|not found' ldd__bz2.txt || true
+
+          echo "== Run failing test only =="
+          "$PYBIN" -m test -vv test_bz2 -m testDecompressorChunksMaxsize || true
 
       - name: Publish artifact
         uses: actions/upload-artifact@v6
