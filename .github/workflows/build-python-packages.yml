@@ -96,7 +96,7 @@ jobs:
         run: |
           min_version="3.15.0-alpha.3"
           version="${{ env.VERSION }}"
-          if [ "$(printf '%s\n' "$min_version" "$version" | sort -V | head -n1)" = "$min_version" ] && [ "$version" != "$min_version" ]; then
+          if [ "$(printf '%s\n' "$version" "$min_version" | sort -V | head -n1)" = "$min_version" ]; then
             echo "Before:"
             dpkg -l | grep libbz2
             sudo apt-get update
