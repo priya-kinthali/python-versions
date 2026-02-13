@@ -90,14 +90,28 @@ jobs:
         with:
           submodules: true
       
-      - name: Reinstall bz2 packages (Ubuntu 22.04 ARM)
+      - name: Build local bzip2 and use it (ubuntu-22.04-arm)
         if: matrix.os == 'ubuntu-22.04-arm'
         shell: bash
         run: |
           set -euxo pipefail
           sudo apt-get update
-          sudo apt-get install -y --reinstall libbz2-1.0 libbz2-dev bzip2
-          dpkg -l | grep -E 'libbz2|bzip2'
+          sudo apt-get install -y make gcc curl
+
+          PREFIX="$RUNNER_TEMP/bzip2"
+          rm -rf "$PREFIX" "$RUNNER_TEMP/bzip2-src"
+          mkdir -p "$RUNNER_TEMP/bzip2-src"
+          cd "$RUNNER_TEMP/bzip2-src"
+
+          curl -fsSLO https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
+          tar -xzf bzip2-1.0.8.tar.gz
+          cd bzip2-1.0.8
+          make -j"$(nproc)" CFLAGS="-fPIC -O2"
+          make install PREFIX="$PREFIX"
+
+          echo "CPPFLAGS=-I$PREFIX/include" >> "$GITHUB_ENV"
+          echo "LDFLAGS=-L$PREFIX/lib" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$PREFIX/lib:\$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
                   
       - name: Publish artifact
         uses: actions/upload-artifact@v6
