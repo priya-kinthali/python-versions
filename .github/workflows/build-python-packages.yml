@@ -135,16 +135,33 @@ jobs:
           ./builders/build-python.ps1 -Version $env:VERSION `
                   -Platform ${{ matrix.platform }} -Architecture ${{ matrix.arch }}
                   
+      - name: Locate built libpython (ubuntu-22.04-arm)
+        if: matrix.os == 'ubuntu-22.04-arm'
+        shell: bash
+        run: |
+          set -euxo pipefail
+          find /home/runner/work/_temp/SourceCode -name 'libpython3.15.so.1.0' -o -name 'libpython3.15.so*' 2>/dev/null | head -n 50
+      - name: Add built libpython to LD_LIBRARY_PATH (ubuntu-22.04-arm)
+        if: matrix.os == 'ubuntu-22.04-arm'
+        shell: bash
+        run: |
+          set -euxo pipefail
+          LIBPY="$(find /home/runner/work/_temp/SourceCode -name 'libpython3.15.so.1.0' -type f 2>/dev/null | head -n 1 || true)"
+          echo "LIBPY=$LIBPY"
+          test -n "$LIBPY"
+          LIBDIR="$(dirname "$LIBPY")"
+          echo "Adding $LIBDIR to LD_LIBRARY_PATH"
+          echo "LD_LIBRARY_PATH=$LIBDIR:$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
       - name: Verify built Python uses our libbz2 (ubuntu-22.04-arm)
         if: matrix.os == 'ubuntu-22.04-arm'
         shell: bash
         run: |
           set -euxo pipefail
+
           echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
 
-          PY_BIN="$(find /home/runner/work/_temp/SourceCode -maxdepth 4 -type f -name python -perm -111 2>/dev/null | head -n 1 || true)"
-          echo "Found python at: $PY_BIN"
-          test -n "$PY_BIN"
+          PY_BIN="/home/runner/work/_temp/SourceCode/python"
+          test -x "$PY_BIN"
 
           "$PY_BIN" -VV
           "$PY_BIN" -c "import _bz2, os; print('_bz2:', os.path.abspath(_bz2.__file__))"
