@@ -107,14 +107,14 @@ jobs:
           test -n "$LIBPY"
           LIBDIR="$(dirname "$LIBPY")"
           echo "LD_LIBRARY_PATH=$LIBDIR:${LD_LIBRARY_PATH-}" >> "$GITHUB_ENV"
-      - name: Reproduce failing bz2 test with built python (ubuntu-22.04-arm)
-        if: matrix.os == 'ubuntu-22.04-arm'
-        shell: bash
-        run: |
-          set -euxo pipefail
-          PY=/home/runner/work/_temp/SourceCode/python
-          "$PY" -VV
-          "$PY" -m test -v test_bz2 -m testDecompressorChunksMaxsize
+      # - name: Reproduce failing bz2 test with built python (ubuntu-22.04-arm)
+      #   if: matrix.os == 'ubuntu-22.04-arm'
+      #   shell: bash
+      #   run: |
+      #     set -euxo pipefail
+      #     PY=/home/runner/work/_temp/SourceCode/python
+      #     "$PY" -VV
+      #     "$PY" -m test -v test_bz2 -m testDecompressorChunksMaxsize
       - name: Show failing test code (ubuntu-22.04-arm)
         if: matrix.os == 'ubuntu-22.04-arm'
         shell: bash
