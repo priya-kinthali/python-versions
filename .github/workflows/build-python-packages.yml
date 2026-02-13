@@ -106,7 +106,7 @@ jobs:
           echo "LIBPY=$LIBPY"
           test -n "$LIBPY"
           LIBDIR="$(dirname "$LIBPY")"
-          echo "LD_LIBRARY_PATH=$LIBDIR:$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$LIBDIR:${LD_LIBRARY_PATH-}" >> "$GITHUB_ENV"
       - name: Reproduce failing bz2 test with built python (ubuntu-22.04-arm)
         if: matrix.os == 'ubuntu-22.04-arm'
         shell: bash
