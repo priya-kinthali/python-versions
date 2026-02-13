@@ -90,28 +90,44 @@ jobs:
         with:
           submodules: true
       
-      - name: Build local bzip2 and use it (ubuntu-22.04-arm)
+      - name: OS + libbz2 (ubuntu-22.04-arm only)
+        if: matrix.os == 'ubuntu-22.04-arm'
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cat /etc/os-release
+          uname -a
+          dpkg -l | grep -E 'libbz2|bzip2' || true
+          ls -l /lib/aarch64-linux-gnu/libbz2.so.1.0* || true
+
+      - name: Build local shared libbz2 (ubuntu-22.04-arm only)
         if: matrix.os == 'ubuntu-22.04-arm'
         shell: bash
         run: |
           set -euxo pipefail
           sudo apt-get update
-          sudo apt-get install -y make gcc curl
-
-          PREFIX="$RUNNER_TEMP/bzip2"
+          sudo apt-get install -y build-essential curl
+          PREFIX="$RUNNER_TEMP/local-bzip2"
           rm -rf "$PREFIX" "$RUNNER_TEMP/bzip2-src"
           mkdir -p "$RUNNER_TEMP/bzip2-src"
           cd "$RUNNER_TEMP/bzip2-src"
-
           curl -fsSLO https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
           tar -xzf bzip2-1.0.8.tar.gz
           cd bzip2-1.0.8
           make -j"$(nproc)" CFLAGS="-fPIC -O2"
-          make install PREFIX="$PREFIX"
+          gcc -shared -Wl,-soname,libbz2.so.1.0 -o libbz2.so.1.0.8 blocksort.o huffman.o crctable.o randtable.o compress.o decompress.o bzlib.o
+          ln -sf libbz2.so.1.0.8 libbz2.so.1.0
+          ln -sf libbz2.so.1.0.8 libbz2.so
+          mkdir -p "$PREFIX/lib"
+          cp -a libbz2.so* "$PREFIX/lib/"
+          ls -l "$PREFIX/lib/libbz2.so"*
 
-          echo "CPPFLAGS=-I$PREFIX/include" >> "$GITHUB_ENV"
-          echo "LDFLAGS=-L$PREFIX/lib" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=$PREFIX/lib:\$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
+      - name: Force runtime to use local libbz2 (ubuntu-22.04-arm only)
+        if: matrix.os == 'ubuntu-22.04-arm'
+        shell: bash
+        run: |
+          set -euxo pipefail
+          echo "LD_LIBRARY_PATH=$RUNNER_TEMP/local-bzip2/lib:\$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
       - name: Build Python ${{ env.VERSION }}
         run: |
           ./builders/build-python.ps1 -Version $env:VERSION `
