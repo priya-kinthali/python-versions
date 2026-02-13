@@ -91,66 +91,9 @@ jobs:
           submodules: true
       
       - name: Build Python ${{ env.VERSION }}
-        shell: pwsh
         run: |
-          Write-Host "RUNNER_TOOL_CACHE=$env:RUNNER_TOOL_CACHE"
-          Write-Host "AGENT_TOOLSDIRECTORY=$env:AGENT_TOOLSDIRECTORY"
-          Write-Host "GITHUB_WORKSPACE=$env:GITHUB_WORKSPACE"
-          ./builders/build-python.ps1 -Version $env:VERSION -Platform ${{ matrix.platform }} -Architecture ${{ matrix.arch }}
-      - name: Diagnose bz2 linkage (Linux only)
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          set -euxo pipefail
-
-          echo "== OS =="
-          cat /etc/os-release || true
-          uname -a || true
-
-          echo "== Toolcache env =="
-          echo "RUNNER_TOOL_CACHE=${RUNNER_TOOL_CACHE:-}"
-          echo "AGENT_TOOLSDIRECTORY=${AGENT_TOOLSDIRECTORY:-}"
-          echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-}"
-
-          echo "== Find built python (exclude *-config) =="
-          SEARCH_DIRS=()
-          [ -n "${RUNNER_TOOL_CACHE:-}" ] && SEARCH_DIRS+=("$RUNNER_TOOL_CACHE")
-          [ -n "${AGENT_TOOLSDIRECTORY:-}" ] && SEARCH_DIRS+=("$AGENT_TOOLSDIRECTORY")
-          SEARCH_DIRS+=("/opt/hostedtoolcache" "/opt" "/usr/local" "$GITHUB_WORKSPACE")
-
-          PYBIN=""
-          for d in "${SEARCH_DIRS[@]}"; do
-            [ -d "$d" ] || continue
-            # candidates: .../bin/python, .../bin/python3, .../bin/python3.13, etc (but not python*-config)
-            while IFS= read -r cand; do
-              case "$cand" in
-                *-config) continue ;;
-              esac
-              if "$cand" -c "import sys; print(sys.executable)" >/dev/null 2>&1; then
-                PYBIN="$cand"
-                break 2
-              fi
-            done < <(find "$d" -type f -executable \
-              \( -path '*/bin/python' -o -path '*/bin/python3' -o -path '*/bin/python3.*' \) \
-              2>/dev/null | head -n 200)
-          done
-
-          echo "PYBIN=$PYBIN"
-          test -n "$PYBIN"
-
-          echo "== Python version/executable =="
-          "$PYBIN" -c "import sys; print(sys.version); print('exe:', sys.executable)"
-
-          echo "== _bz2 extension location =="
-          "$PYBIN" -c "import _bz2; print(_bz2.__file__)"
-
-          echo "== ldd on _bz2 (which libbz2 is used) =="
-          BZ2SO="$("$PYBIN" -c "import _bz2; print(_bz2.__file__)")"
-          ldd "$BZ2SO" | tee ldd__bz2.txt
-          grep -E 'libbz2|not found' ldd__bz2.txt || true
-
-          echo "== Run failing test only =="
-          "$PYBIN" -m test -vv test_bz2 -m testDecompressorChunksMaxsize || true
+          ./builders/build-python.ps1 -Version $env:VERSION `
+                  -Platform ${{ matrix.platform }} -Architecture ${{ matrix.arch }}
 
       - name: Publish artifact
         uses: actions/upload-artifact@v6
