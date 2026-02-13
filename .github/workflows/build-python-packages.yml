@@ -91,36 +91,68 @@ jobs:
           submodules: true
       
       - name: Build Python ${{ env.VERSION }}
-        env:
-          LD_LIBRARY_PATH: ${{ runner.temp }}/local-bzip2/lib:${{ env.LD_LIBRARY_PATH }}
         run: |
           ./builders/build-python.ps1 -Version $env:VERSION `
                   -Platform ${{ matrix.platform }} -Architecture ${{ matrix.arch }}
-                  
-      - name: Add built libpython to LD_LIBRARY_PATH (ubuntu-22.04-arm)
+      - name: Debug bz2 failure (Linux only)
         if: matrix.os == 'ubuntu-22.04-arm'
         shell: bash
         run: |
           set -euxo pipefail
-          LIBPY="$(find /home/runner/work/_temp/SourceCode -name 'libpython3.15.so.1.0' -type f 2>/dev/null | head -n 1 || true)"
-          echo "LIBPY=$LIBPY"
-          test -n "$LIBPY"
-          LIBDIR="$(dirname "$LIBPY")"
-          echo "LD_LIBRARY_PATH=$LIBDIR:${LD_LIBRARY_PATH-}" >> "$GITHUB_ENV"
-      # - name: Reproduce failing bz2 test with built python (ubuntu-22.04-arm)
-      #   if: matrix.os == 'ubuntu-22.04-arm'
-      #   shell: bash
-      #   run: |
-      #     set -euxo pipefail
-      #     PY=/home/runner/work/_temp/SourceCode/python
-      #     "$PY" -VV
-      #     "$PY" -m test -v test_bz2 -m testDecompressorChunksMaxsize
-      - name: Show failing test code (ubuntu-22.04-arm)
-        if: matrix.os == 'ubuntu-22.04-arm'
-        shell: bash
-        run: |
-          set -euxo pipefail
-          sed -n '920,950p' /home/runner/work/_temp/SourceCode/Lib/test/test_bz2.py
+
+          echo "== OS =="
+          cat /etc/os-release || true
+          uname -a || true
+
+          echo "== bz2 packages =="
+          dpkg -l | grep -E 'libbz2|bzip2' || true
+
+          echo "== Find built python =="
+          PYBIN="$(find "$GITHUB_WORKSPACE" -type f -executable \
+            \( -name 'python' -o -name 'python3' -o -name 'python3.*' \) \
+            ! -path '*/.git/*' ! -path '*/.venv/*' ! -path '*/venv/*' \
+            | head -n 1 || true)"
+          echo "PYBIN=$PYBIN"
+          test -n "$PYBIN"
+
+          echo "== Python + _bz2 paths =="
+          "$PYBIN" -c "import sys; print(sys.version)"
+          "$PYBIN" -c "import _bz2; print('_bz2:', _bz2.__file__)"
+          "$PYBIN" -c "import bz2; print('bz2:', bz2.__file__)"
+
+          echo "== ldd on _bz2 (which libbz2 is used) =="
+          BZ2SO="$("$PYBIN" -c "import _bz2; print(_bz2.__file__)")"
+          ldd "$BZ2SO" | tee ldd__bz2.txt
+          grep -E 'libbz2|not found' ldd__bz2.txt || true
+
+          echo "== Run only the failing test with verbose output =="
+          "$PYBIN" -m test -vv test_bz2 -m testDecompressorChunksMaxsize || true
+
+          echo "== Inline reproducer: check needs_input with max_length limiting output =="
+          "$PYBIN" - <<'PY'
+          import bz2, binascii
+          data = (b"0123456789abcdef" * 1024 * 64)  # some compressible data
+          comp = bz2.compress(data, compresslevel=9)
+
+          d = bz2.BZ2Decompressor()
+          out1 = d.decompress(comp, max_length=1)
+          print("out1_len:", len(out1))
+          print("needs_input_after_out1:", d.needs_input)
+
+          out2 = d.decompress(b"", max_length=1024)
+          print("out2_len:", len(out2))
+          print("needs_input_after_out2:", d.needs_input)
+
+          # keep draining buffered output without providing input
+          total = len(out1) + len(out2)
+          while True:
+            chunk = d.decompress(b"", max_length=65536)
+            if not chunk:
+              break
+            total += len(chunk)
+          print("drained_total:", total)
+          print("needs_input_end:", d.needs_input)
+          PY
 
       - name: Publish artifact
         uses: actions/upload-artifact@v6
