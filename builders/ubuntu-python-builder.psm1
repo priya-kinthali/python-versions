@@ -72,6 +72,9 @@ class UbuntuPythonBuilder : NixPythonBuilder {
         Execute-Command -Command "sudo apt-get update"
         Execute-Command -Command $tkinterInstallString
 
+        ### Update/reinstall bzip2 libraries to avoid version mismatches that cause test_bz2 failures
+        Execute-Command -Command "sudo apt install --reinstall -y libbz2-1.0 bzip2"
+
         ### Install dependent packages
         @(
             "make",
