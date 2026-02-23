@@ -81,7 +81,6 @@ class UbuntuPythonBuilder : NixPythonBuilder {
             "build-essential",
             "libssl-dev",
             "zlib1g-dev",
-            "libbz2-dev",
             "libsqlite3-dev",
             "libncursesw5-dev",
             "libreadline-dev",
