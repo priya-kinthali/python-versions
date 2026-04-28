@@ -121,9 +121,14 @@ Copy-Item -Path ./$PythonExecName -Destination $PythonArchPath | Out-Null
 Write-Host "Install Python $Version in $PythonToolcachePath..."
 $ExecParams = Get-ExecParams -IsMSI $IsMSI -IsFreeThreaded $IsFreeThreaded -PythonArchPath $PythonArchPath
 
-cmd.exe /c "cd $PythonArchPath && call $PythonExecName $ExecParams /quiet"
-if ($LASTEXITCODE -ne 0) {
-    Throw "Error happened during Python installation"
+$installerPath = Join-Path -Path $PythonArchPath -ChildPath $PythonExecName
+$installerLog  = Join-Path -Path $env:TEMP -ChildPath "python-installer-$Version-$Architecture.log"
+$argList = "$ExecParams /quiet /log `"$installerLog`""
+Write-Host "Running: $installerPath $argList"
+$proc = Start-Process -FilePath $installerPath -ArgumentList $argList -Wait -PassThru -WorkingDirectory $PythonArchPath
+if ($proc.ExitCode -ne 0) {
+    if (Test-Path $installerLog) { Get-Content $installerLog | Write-Host }
+    Throw "Error happened during Python installation (exit code: $($proc.ExitCode))"
 }
 
 if ($IsFreeThreaded) {
