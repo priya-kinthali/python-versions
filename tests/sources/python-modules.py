@@ -206,7 +206,6 @@ if sys.version_info >= (3, 10):
 # 'binhex' module has been removed from Python 3.11
 if sys.version_info >= (3, 11):
     standard_library.remove('binhex')
-    standard_library.remove('crypt')
 
 # 'smtpd', 'asyncore' and 'asynchat' modules have been removed from Python 3.12
 # https://docs.python.org/dev/whatsnew/3.12.html
@@ -216,9 +215,8 @@ if sys.version_info >= (3, 12):
     standard_library.remove('smtpd')
     standard_library.remove('asyncore')
     standard_library.remove('asynchat')
-    standard_library.remove('crypt')
 
-# 'aifc', 'cgi', 'cgitb', 'chunk', 'crypt', 'imghdr', 'lib2to3', 'mailcap', 'nntplib',
+# 'aifc', 'cgi', 'cgitb', 'chunk', 'imghdr', 'lib2to3', 'mailcap', 'nntplib',
 # 'pipes', 'sndhdr', 'sunau', 'telnetlib', 'uu' and 'xdrlib' modules have been removed
 # from Python 3.13
 # https://docs.python.org/dev/whatsnew/3.13.html
@@ -227,7 +225,6 @@ if sys.version_info >= (3, 13):
     standard_library.remove('cgi')
     standard_library.remove('cgitb')
     standard_library.remove('chunk')
-    standard_library.remove('crypt')
     standard_library.remove('imghdr')
     standard_library.remove('lib2to3')
     standard_library.remove('mailcap')
